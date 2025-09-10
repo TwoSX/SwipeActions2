@@ -52,7 +52,7 @@ public struct SwipeAction<V1: View, V2: View>: ViewModifier {
      To detect if drag gesture is ended:
      https://forums.developer.apple.com/forums/thread/123034
      */
-    @GestureState private var isDragging: Bool = false
+    @State private var isDragging: Bool = false
     
     @State private var gestureState: GestureStatus = .idle
     
@@ -196,14 +196,14 @@ public struct SwipeAction<V1: View, V2: View>: ViewModifier {
                 contentWidth = $0.width
                 contentHeight = $0.height
             }
-            .gesture (
-                DragGesture(minimumDistance: minimumDistance, coordinateSpace: .global)
-                    .updating($isDragging) { _, isDragging, _ in
-                        isDragging = true
-                    }
-                    .onChanged(onDragChange(_:))
-                    .onEnded(onDragEnded(_:))
-            )
+            .modifier(SwipeGestureModifier(
+                minimumDistance: minimumDistance,
+                onChanged: onDragChange,
+                onEnded: onDragEnded,
+                updateDragging: { 
+                    isDragging = $0
+                }
+            ))
             .valueChanged(of: gestureState) { state in
                 guard state == .started else { return }
                 gestureState = .active
@@ -267,16 +267,16 @@ public struct SwipeAction<V1: View, V2: View>: ViewModifier {
             }
     }
     
-    private func onDragChange(_ value: DragGesture.Value) {
+    private func onDragChange(_ translation: CGSize) {
         guard gestureState == .started || gestureState == .active else { return }
         
         let totalSlide: CGFloat
         
         switch layoutDirection {
         case .rightToLeft:
-            totalSlide = -value.translation.width + oldOffset
+            totalSlide = -translation.width + oldOffset
         default:
-            totalSlide = value.translation.width + oldOffset
+            totalSlide = translation.width + oldOffset
         }
 
         if allowsFullSwipe {
@@ -299,15 +299,15 @@ public struct SwipeAction<V1: View, V2: View>: ViewModifier {
         }
     }
     
-    private func onDragEnded(_ value: DragGesture.Value) {
+    private func onDragEnded(_ translation: CGSize) {
         gestureState = .ended
         
         let translationWidth: CGFloat
         switch layoutDirection {
         case .rightToLeft:
-            translationWidth = -value.translation.width
+            translationWidth = -translation.width
         default:
-            translationWidth = value.translation.width
+            translationWidth = translation.width
         }
         
         withAnimation {
