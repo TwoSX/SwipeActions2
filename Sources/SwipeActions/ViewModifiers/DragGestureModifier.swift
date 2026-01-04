@@ -97,7 +97,7 @@ struct SwipeGestureModifier: ViewModifier {
                 updateDragging: updateDragging
             ))
         } else {
-            content.gesture (
+            content.simultaneousGesture (
                 DragGesture(minimumDistance: minimumDistance, coordinateSpace: .global)
                     .updating($isDragging) { _, isDragging, _ in
                         isDragging = true

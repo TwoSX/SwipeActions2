@@ -114,15 +114,7 @@ public struct SwipeAction<V1: View, V2: View>: ViewModifier {
                     maxLeadingOffsetIsCounted = true
                 }
             }
-            .valueChanged(of: leadingSwipeView.debugDescription.hashValue) { _ in
-                leadingViewId = UUID()
-                maxLeadingOffsetIsCounted = false
-                maxLeadingOffset = .zero
-                lastLeadingWidth = .zero
-                withAnimation(.default) {
-                    reset()
-                }
-            }
+
     }
     
     private var trailingView: some View {
@@ -138,15 +130,7 @@ public struct SwipeAction<V1: View, V2: View>: ViewModifier {
                     minTrailingOffsetIsCounted = true
                 }
             }
-            .valueChanged(of: trailingSwipeView.debugDescription.hashValue) { _ in
-                trailingViewId = UUID()
-                minTrailingOffsetIsCounted = false
-                minTrailingOffset = .zero
-                lastTrailingWidth = .zero
-                withAnimation(.default) {
-                    reset()
-                }
-            }
+
     }
     
     private var swipedMenu: some View {
